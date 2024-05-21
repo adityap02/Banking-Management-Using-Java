@@ -1,10 +1,13 @@
-package com.aditya;
+package com.aditya.services;
+
+import com.aditya.exceptions.InsufficientBalanceException;
 
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
 public class User {
+
     Scanner input = new Scanner(System.in);
     void userOptions(Main main) {
         boolean exit = true;
@@ -17,38 +20,47 @@ public class User {
         System.out.println("5. Deposit");
         System.out.println("6. Withdraw");
         System.out.println("7. Back to main menu...C");
-        int choice = Integer.parseInt(input.nextLine());
+        try {
+            int choice;
+            try {
+                choice  = Integer.parseInt(input.nextLine());
+            }catch (NumberFormatException e){
+                throw new NumberFormatException("Please Enter Choices from 1 to 7");
+            }
 
-            switch (choice) {
-                case 1:
-                    System.out.println("Account created successfully with customer id:" + createAccount(main));
-                    break;
-                case 2:
-                    if (deleteAccount(main)) {
-                        System.out.println("Account deleted successfully");
-                    } else {
-                        System.out.println("Account not found");
-                    }
-                    break;
-                case 3:
-                    listAccounts(main);
-                    break;
-                case 4:
-                    checkBalance(main);
-                    break;
-                case 5:
-                    System.out.println("Deposit");
-                    depositAmount(main);
-                    break;
-                case 6:
-                    System.out.println("Withdraw");
-                    withdrawAmount(main);
-                    break;
-                case 7:
-                    exit = false;
-                    break;
-                default:
-                    System.out.println("Invalid choice");
+                switch (choice) {
+                    case 1:
+                        System.out.println("Account created successfully with customer id:" + createAccount(main));
+                        break;
+                    case 2:
+                        if (deleteAccount(main)) {
+                            System.out.println("Account deleted successfully");
+                        } else {
+                            System.out.println("Account not found");
+                        }
+                        break;
+                    case 3:
+                        listAccounts(main);
+                        break;
+                    case 4:
+                        checkBalance(main);
+                        break;
+                    case 5:
+                        System.out.println("Deposit");
+                        depositAmount(main);
+                        break;
+                    case 6:
+                        System.out.println("Withdraw");
+                        withdrawAmount(main);
+                        break;
+                    case 7:
+                        exit = false;
+                        break;
+                    default:
+                        System.out.println("Invalid choice");
+                }
+            }catch (NumberFormatException e){
+                System.out.println("Invalid choice :" + e.getMessage());
             }
         }
     }
@@ -62,9 +74,14 @@ public class User {
         main.customerList.put(custId,account);
         return custId;
     }
-    private Boolean deleteAccount(Main main){
+    private Boolean deleteAccount(Main main) throws NumberFormatException{
         System.out.println("Enter your customer id:");
-        int customerId = Integer.parseInt(input.nextLine());
+        int customerId;
+        try {
+            customerId = Integer.parseInt(input.nextLine());
+        }catch (NumberFormatException e){
+            throw new NumberFormatException("Invalid customer id");
+        }
         Account account = main.customerList.get(customerId);
         if(account == null){
             return false;
@@ -109,12 +126,15 @@ public class User {
         Account account = main.customerList.get(customerId);
         System.out.println("Enter the amount to withdraw:");
         double amount = Double.parseDouble(input.nextLine());
-        if(account.getBalance() < amount){
-            System.out.println("Insufficient balance");
-            return;
-        }
         AccountOperations accountOperations = new AccountOperations(account);
-        main.customerList.put(customerId,accountOperations.deposit(amount));
-        System.out.println("Amount deposited successfully");
+        try {
+            main.customerList.put(customerId, accountOperations.withdraw(amount));
+            System.out.println("Amount withdrawn successfully");
+        }
+        catch (InsufficientBalanceException e){
+            System.out.println(e.toString());
+        }
+
+
     }
 }

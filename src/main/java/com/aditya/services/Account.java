@@ -1,4 +1,4 @@
-package com.aditya;
+package com.aditya.services;
 
 public class Account {
     private String name;

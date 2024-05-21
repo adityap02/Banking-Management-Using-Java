@@ -1,8 +1,10 @@
-package com.aditya;
+package com.aditya.services;
+
+import com.aditya.exceptions.InsufficientBalanceException;
 
 import java.util.Scanner;
 
-public class CustomerOperations {
+public class CustomerOperations{
     Scanner input = new Scanner(System.in);
     public void customerLogin(Main main){
         System.out.println("Enter your customer ID:");
@@ -35,7 +37,11 @@ public class CustomerOperations {
                     break;
                 case 6:
                     System.out.println("Enter Amount to Withdraw");
-                    accountOperations.withdraw(Double.parseDouble(input.nextLine()));
+                    try {
+                        accountOperations.withdraw(Double.parseDouble(input.nextLine()));
+                    }catch (InsufficientBalanceException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 7:
                     exit = false;
